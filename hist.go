@@ -23,18 +23,27 @@ func VarBinDistance(d1, d2 Dataset, nbins int) float64 {
 		panic("datasets don't have same number of dimensions")
 	}
 
+	bounds := make([]Bins, d1.Dims())
+	for i := range bounds {
+		bounds[i] = NewBins(0, 1, nbins)
+	}
+	h1 := Make(d1, bounds)
+	h2 := Make(d2, bounds)
+
 	distances := []float64{}
+
 	for nbins > 0 {
+		d := L1Distance(h1, h2)
+		distances = append(distances, d)
+
+		nbins /= 2
+		inter := Intersect(h1, h2)
+		h1 = Diff(h1, inter)
+		h2 = Diff(h2, inter)
 		bounds := make([]Bins, d1.Dims())
 		for i := range bounds {
 			bounds[i] = NewBins(0, 1, nbins)
 		}
-
-		h1 := Make(d1, bounds)
-		h2 := Make(d2, bounds)
-		d := L2Distance(h1, h2)
-		distances = append(distances, d)
-		nbins /= 2
 	}
 
 	tot := 0.0
@@ -42,6 +51,28 @@ func VarBinDistance(d1, d2 Dataset, nbins int) float64 {
 		tot += d
 	}
 	return tot / float64(len(distances))
+}
+
+func Diff(h1, h2 Hist) Hist {
+	diff := Hist{}
+	for k := range h1 {
+		diff[k] = h1[k] - h2[k]
+	}
+	for k := range h2 {
+		diff[k] = h1[k] - h2[k]
+	}
+	return diff
+}
+
+func Intersect(h1, h2 Hist) Hist {
+	inter := Hist{}
+	for k := range h1 {
+		inter[k] = math.Min(h1[k], h2[k])
+	}
+	for k := range h2 {
+		inter[k] = math.Min(h1[k], h2[k])
+	}
+	return inter
 }
 
 func L2Distance(h1, h2 Hist) float64 {

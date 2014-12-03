@@ -13,6 +13,8 @@ import (
 	"github.com/rwcarlsen/hist"
 )
 
+var nbins = flag.Int("nbins", 256, "initial number of bins per dimension")
+
 func main() {
 	log.SetFlags(0)
 	flag.Parse()
@@ -38,7 +40,7 @@ func main() {
 	img1 := hist.NewDatasetImage(ig1)
 	img2 := hist.NewDatasetImage(ig2)
 
-	dist := hist.VarBinDistance(img1, img2, 512)
+	dist := hist.VarBinDistance(img1, img2, *nbins)
 	fmt.Println(dist)
 }
 
