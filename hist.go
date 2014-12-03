@@ -33,7 +33,7 @@ func VarBinDistance(d1, d2 Dataset, nbins int) float64 {
 	distances := []float64{}
 
 	for nbins > 0 {
-		d := L1Distance(h1, h2)
+		d := L2Distance(h1, h2)
 		distances = append(distances, d)
 
 		nbins /= 2
@@ -87,7 +87,7 @@ func L2Distance(h1, h2 Hist) float64 {
 	for _, val := range distances {
 		d += val * val
 	}
-	return d
+	return math.Sqrt(d)
 }
 
 func L1Distance(h1, h2 Hist) float64 {
@@ -195,7 +195,8 @@ func (img *Image) Len() int {
 	return img.w * img.h
 }
 
-func (img *Image) Dims() int { return 5 }
+//func (img *Image) Dims() int { return 5 }
+func (img *Image) Dims() int { return 3 }
 
 func (img Image) At(i int) []float64 {
 	dy := i / img.w
@@ -206,8 +207,8 @@ func (img Image) At(i int) []float64 {
 	r, g, b, _ := img.Image.At(x, y).RGBA()
 
 	return []float64{
-		float64(dx) / float64(img.w),
-		float64(dy) / float64(img.h),
+		//float64(dx) / float64(img.w),
+		//float64(dy) / float64(img.h),
 		float64(r) / 0xFFFF,
 		float64(g) / 0xFFFF,
 		float64(b) / 0xFFFF,
